@@ -109,7 +109,69 @@ export const getWorksapceFolders = async (workspaceId: string)=>{
 }
 
 export const getUserVideos = async (workspaceId: string)=>{
+    try {
+        const user = await currentUser();
+        if(!user){
+            return {
+                status: 404,
+                message: "user not found",
+                data: undefined,
+            }
+        }
 
+        const videos = await prisma.video.findMany({
+            where: {
+                OR: [
+                    {workSpaceId: workspaceId},
+                    {folderId: workspaceId},
+                ],
+            },
+            select: {
+                id: true,
+                title: true,
+                createdAt: true,
+                source: true,
+                processing: true,
+                folder: {
+                    select: {
+                        id: true,
+                        name: true,
+                    },
+                },
+                user: {
+                    select: {
+                        firstName: true,
+                        lastName: true,
+                        image: true,
+                    },
+                },
+            },
+            orderBy: {
+                createdAt: 'asc'
+            },            
+        });
+
+        if(videos && videos.length > 0){
+            return {
+                status: 200,
+                message: "videos fetched",
+                data: videos
+            }
+        }
+
+        return {
+            status: 404,
+            message: "failed to fetch video",
+            data: []
+        }
+
+    } catch (error) {
+        return {
+            status: 404,
+            message: "something went wrong",
+            error
+        }
+    }
 }
 
 export const getWorkspaces = async ()=>{
