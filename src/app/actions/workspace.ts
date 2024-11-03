@@ -175,7 +175,60 @@ export const getUserVideos = async (workspaceId: string)=>{
 }
 
 export const getWorkspaces = async ()=>{
-    
+    try {
+        const user = await currentUser();
+        if(!user)   return {success: false, status:404}
+
+        const workspaces = await prisma.user.findUnique({
+            where: {
+                clerkId: user.id,
+            },
+            select: {
+                subscription: {
+                    select: {
+                        plan: true,
+                    },
+                },
+                workSpace: {
+                    select: {
+                        id: true,
+                        name: true,
+                        type: true,
+                    },
+                },
+                members: {
+                    select: {
+                        workSpace: {
+                            select: {
+                                id: true,
+                                name: true,
+                                type: true,
+                            },
+                        },
+                    },
+                },
+            },
+        });
+
+        if(workspaces){
+            return {
+                success: true,
+                status: 200,
+                data: workspaces,
+            }
+        }
+
+        return {
+            success: false,
+            status: 404,
+            data: []
+        }
+    } catch (error) {
+        return {
+            success: false,
+            status: 500,
+        }
+    }
 }
 
 export const getNotification = async ()=>{
