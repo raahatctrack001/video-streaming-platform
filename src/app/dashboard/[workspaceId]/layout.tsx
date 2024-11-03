@@ -1,5 +1,11 @@
 import { onAuthenticateUser } from "@/app/actions/user";
-import { getNotification, getUserVideos, getWorksapceFolders, getWorkspaces, verifyAccessToWorkspace } from "@/app/actions/workspace";
+import { 
+    getNotifications,
+    getUserVideos, 
+    getWorksapceFolders, 
+    getWorkspaces, 
+    verifyAccessToWorkspace 
+} from "@/app/actions/workspace";
 import { redirect } from "next/navigation";
 import React from "react";
 import {
@@ -57,7 +63,7 @@ export default async function Layout({ params: { workspaceId }, children }: Prop
 
     await query.prefetchQuery({
         queryKey: ["user-notification"],
-        queryFn: ()=>getNotification(),
+        queryFn: ()=>getNotifications(),
     })
    
     return <div>{children}</div>;

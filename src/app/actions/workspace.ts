@@ -231,6 +231,29 @@ export const getWorkspaces = async ()=>{
     }
 }
 
-export const getNotification = async ()=>{
-    
-}
+
+export const getNotifications = async () => {
+    try {
+      const user = await currentUser()
+      if (!user) return { status: 404 }
+      const notifications = await prisma.user.findUnique({
+        where: {
+          clerkId: user.id,
+        },
+        select: {
+          notification: true,
+          _count: {
+            select: {
+              notification: true,
+            },
+          },
+        },
+      });
+  
+      if (notifications && notifications.notification.length > 0)
+        return { success: true, status: 200, data: notifications }
+      return { success: false, status: 404, data: [] }
+    } catch (error) {
+      return { success: false, status: 400, data: [] }
+    }
+  }
